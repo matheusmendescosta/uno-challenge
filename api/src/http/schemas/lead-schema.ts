@@ -1,0 +1,50 @@
+import { z } from "zod";
+
+export enum LeadStatusEnum {
+  NOVO = "novo",
+  CONTACTADO = "contactado",
+  QUALIFICADO = "qualificado",
+  CONVERTIDO = "convertido",
+  PERDIDO = "perdido",
+}
+
+export const createLeadSchema = z.object({
+  contactId: z
+    .string({ message: "O ID do contato é obrigatório" })
+    .uuid("O ID do contato deve ser um UUID válido"),
+  name: z
+    .string({ message: "O nome é obrigatório" })
+    .min(2, "O nome deve ter no mínimo 2 caracteres")
+    .max(255, "O nome deve ter no máximo 255 caracteres"),
+  company: z
+    .string({ message: "O nome da empresa é obrigatório" })
+    .min(2, "A empresa deve ter no mínimo 2 caracteres")
+    .max(255, "A empresa deve ter no máximo 255 caracteres"),
+  status: z
+    .enum(["novo", "contactado", "qualificado", "convertido", "perdido"], { message: "Status inválido" })
+    .optional()
+    .default("novo"),
+});
+
+export const updateLeadSchema = z.object({
+  contactId: z
+    .string()
+    .uuid("O ID do contato deve ser um UUID válido")
+    .optional(),
+  name: z
+    .string()
+    .min(2, "O nome deve ter no mínimo 2 caracteres")
+    .max(255, "O nome deve ter no máximo 255 caracteres")
+    .optional(),
+  company: z
+    .string()
+    .min(2, "A empresa deve ter no mínimo 2 caracteres")
+    .max(255, "A empresa deve ter no máximo 255 caracteres")
+    .optional(),
+  status: z
+    .enum(["novo", "contactado", "qualificado", "convertido", "perdido"], { message: "Status inválido" })
+    .optional(),
+});
+
+export type CreateLeadInput = z.infer<typeof createLeadSchema>;
+export type UpdateLeadInput = z.infer<typeof updateLeadSchema>;

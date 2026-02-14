@@ -1,4 +1,6 @@
 import { Sequelize } from "sequelize";
+import { initLead, Lead } from "../../models/lead.js";
+import { initContact, Contact } from "../../models/contact.js";
 
 // Singleton da conexão
 export const sequelize = new Sequelize({
@@ -9,6 +11,15 @@ export const sequelize = new Sequelize({
   database: process.env.DB_NAME || "hono_db",
   logging: false,
 });
+
+// Inicializa os models
+initContact(sequelize);
+initLead(sequelize);
+
+// Configura as associações
+const models = { Lead, Contact };
+Lead.associate(models);
+Contact.associate(models);
 
 // Função para testar conexão
 export const connectDB = async () => {

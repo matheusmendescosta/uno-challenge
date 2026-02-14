@@ -8,6 +8,11 @@ services:
     volumes:
       - ./src:/app/src
       - ./package.json:/app/package.json
+      - ./config:/app/config
+      - ./migrations:/app/migrations
+      - ./seeders:/app/seeders
+      - ./models:/app/models
+      - ./.sequelizerc:/app/.sequelizerc
     depends_on:
       - db
     restart: unless-stopped
