@@ -2,7 +2,7 @@ import "dotenv/config";
 import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["dev", "test", "production"]),
+  NODE_ENV: z.enum(["development", "test", "production"]),
   API_PORT: z.coerce.number().default(3333),
   POSTGRES_PORT: z.string(),
   POSTGRES_USER: z.string(),

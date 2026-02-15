@@ -9,14 +9,15 @@ import type {
 
 export class SequelizeLeadRepository implements ILeadRepository {
   private toEntity(lead: Lead): LeadEntity {
+    const data = lead.get({ plain: true });
     return {
-      id: lead.id,
-      contactId: lead.contactId,
-      name: lead.name,
-      company: lead.company,
-      status: lead.status as LeadStatusType,
-      createdAt: lead.createdAt,
-      updatedAt: lead.updatedAt,
+      id: data.id,
+      contactId: data.contactId,
+      name: data.name,
+      company: data.company,
+      status: data.status as LeadStatusType,
+      createdAt: data.createdAt ?? new Date(),
+      updatedAt: data.updatedAt ?? new Date(),
     };
   }
 

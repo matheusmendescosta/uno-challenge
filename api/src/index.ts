@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { env } from "./env/index.js";
 import { connectDB } from "./lib/db.js";
 import { leadController } from "./http/controllers/lead-controller.js";
+import { contactController } from "./http/controllers/contact-controller.js";
 
 const app = new Hono();
 
@@ -11,6 +12,7 @@ app.get("/", (c) => {
 });
 
 app.route("/leads", leadController);
+app.route("/contacts", contactController);
 
 // Conecta ao banco e inicia o servidor
 connectDB().then(() => {
