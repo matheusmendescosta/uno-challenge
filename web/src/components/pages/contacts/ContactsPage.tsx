@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Search } from "lucide-react"
+import { Pencil, Search, Trash2 } from "lucide-react"
+import Link from "next/link"
+import { toast } from "sonner"
 import {
   Table,
   TableBody,
@@ -14,13 +16,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src
 import { Input } from "@/src/components/ui/input"
 import { Pagination } from "@/src/components/ui/pagination"
 import { Skeleton } from "@/src/components/ui/skeleton"
+import { Button } from "@/src/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/src/components/ui/dialog"
 import { usePaginationParams } from "@/src/hooks/use-pagination-params"
-import { useContacts } from "./use-contacts"
+import { useContacts, useDeleteContact, type Contact } from "./use-contacts"
 import { useDebouncedCallback } from "use-debounce"
 
 const ContactsPage = () => {
   const { page, limit, search, setPage, setLimit, setSearch } = usePaginationParams()
   const [searchInput, setSearchInput] = useState(search)
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null)
+  const { mutate: deleteContact, isPending: isDeleting } = useDeleteContact()
 
   const { data, isLoading, error } = useContacts({
     page,
@@ -35,6 +48,20 @@ const ContactsPage = () => {
   const handleSearchChange = (value: string) => {
     setSearchInput(value)
     debouncedSearch(value)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (contactToDelete) {
+      deleteContact(contactToDelete.id, {
+        onSuccess: () => {
+          toast.success("Contato excluído com sucesso!")
+          setContactToDelete(null)
+        },
+        onError: () => {
+          toast.error("Erro ao excluir contato")
+        },
+      })
+    }
   }
 
   if (error) {
@@ -84,12 +111,13 @@ const ContactsPage = () => {
                   <TableHead>Nome</TableHead>
                   <TableHead>Telefone</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead className="w-25">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data?.data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       Nenhum contato encontrado
                     </TableCell>
                   </TableRow>
@@ -99,6 +127,22 @@ const ContactsPage = () => {
                       <TableCell className="font-medium">{contact.name}</TableCell>
                       <TableCell>{contact.phone}</TableCell>
                       <TableCell>{contact.email}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Link href={`/contacts/${contact.id}/edit`}>
+                            <Button variant="ghost" size="icon">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setContactToDelete(contact)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -118,6 +162,29 @@ const ContactsPage = () => {
           </>
         )}
       </CardContent>
+
+      <Dialog open={!!contactToDelete} onOpenChange={(open) => !open && setContactToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o contato &quot;{contactToDelete?.name}&quot;? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setContactToDelete(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Excluindo..." : "Excluir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

@@ -13,6 +13,7 @@ import {
   BreadcrumbSeparator,
 } from "@/src/components/ui/breadcrumb";
 import { QueryProvider } from "@/src/providers/query-provider";
+import { Toaster } from "@/src/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,6 +72,7 @@ export default function RootLayout({
             </SidebarInset>
           </SidebarProvider>
         </QueryProvider>
+        <Toaster />
       </body>
     </html>
   );
