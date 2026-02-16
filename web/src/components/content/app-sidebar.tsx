@@ -106,13 +106,9 @@ const data = {
     },
     {
       title: "CRM",
-      url: "#",
+      url: "/crm",
       icon: SquareTerminal,
-      items: [
-        { title: "History", url: "#" },
-        { title: "Starred", url: "#" },
-        { title: "Settings", url: "#" },
-      ],
+      items: [{ title: "Funil de Vendas", url: "/crm" }],
     },
   ],
 };
