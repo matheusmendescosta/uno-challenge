@@ -3,6 +3,9 @@ import type {
   CreateContactDTO,
   UpdateContactDTO,
   ContactEntity,
+  ContactFilters,
+  PaginationParams,
+  PaginatedResult,
 } from "../repositories/repository-contact.js";
 
 export class ContactService {
@@ -24,8 +27,11 @@ export class ContactService {
     return this.contactRepository.findByEmail(email);
   }
 
-  async findAll(): Promise<ContactEntity[]> {
-    return this.contactRepository.findAll();
+  async findAll(
+    filters?: ContactFilters,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<ContactEntity>> {
+    return this.contactRepository.findAll(filters, pagination);
   }
 
   async update(id: string, data: UpdateContactDTO): Promise<ContactEntity | null> {

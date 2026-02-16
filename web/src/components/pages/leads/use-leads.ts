@@ -22,8 +22,41 @@ export interface Lead {
   }
 }
 
-async function fetchLeads(): Promise<Lead[]> {
-  const response = await fetch("http://localhost:3333/leads")
+export interface PaginatedLeadsResponse {
+  data: Lead[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface LeadsQueryParams {
+  page?: number
+  limit?: number
+  search?: string
+  status?: LeadStatus
+}
+
+async function fetchLeads(params: LeadsQueryParams = {}): Promise<PaginatedLeadsResponse> {
+  const searchParams = new URLSearchParams()
+
+  if (params.page && params.page > 1) {
+    searchParams.set("page", String(params.page))
+  }
+  if (params.limit) {
+    searchParams.set("limit", String(params.limit))
+  }
+  if (params.search) {
+    searchParams.set("search", params.search)
+  }
+  if (params.status) {
+    searchParams.set("status", params.status)
+  }
+
+  const queryString = searchParams.toString()
+  const url = `http://localhost:3333/leads${queryString ? `?${queryString}` : ""}`
+
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar leads")
@@ -32,9 +65,9 @@ async function fetchLeads(): Promise<Lead[]> {
   return response.json()
 }
 
-export function useLeads() {
+export function useLeads(params: LeadsQueryParams = {}) {
   return useQuery({
-    queryKey: ["leads"],
-    queryFn: fetchLeads,
+    queryKey: ["leads", params],
+    queryFn: () => fetchLeads(params),
   })
 }

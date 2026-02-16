@@ -1,9 +1,13 @@
 import { Contact } from "../../../models/contact.js";
+import { Op } from "sequelize";
 import type {
   IContactRepository,
   CreateContactDTO,
   UpdateContactDTO,
   ContactEntity,
+  ContactFilters,
+  PaginationParams,
+  PaginatedResult,
 } from "../repository-contact.js";
 
 export class SequelizeContactRepository implements IContactRepository {
@@ -38,9 +42,37 @@ export class SequelizeContactRepository implements IContactRepository {
     return contact ? this.toEntity(contact) : null;
   }
 
-  async findAll(): Promise<ContactEntity[]> {
-    const contacts = await Contact.findAll();
-    return contacts.map((contact) => this.toEntity(contact));
+  async findAll(
+    filters?: ContactFilters,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<ContactEntity>> {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const offset = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (filters?.search) {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${filters.search}%` } },
+        { email: { [Op.iLike]: `%${filters.search}%` } },
+      ];
+    }
+
+    const { rows, count } = await Contact.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
+
+    return {
+      data: rows.map((contact) => this.toEntity(contact)),
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    };
   }
 
   async update(

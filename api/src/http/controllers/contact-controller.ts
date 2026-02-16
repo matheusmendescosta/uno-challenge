@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { ContactService } from "../../service/contact-service.js";
 import { SequelizeContactRepository } from "../../repositories/sequelize/sequelize-contact.js";
-import { createContactSchema, updateContactSchema } from "../schemas/contact-schema.js";
+import { createContactSchema, updateContactSchema, contactQuerySchema } from "../schemas/contact-schema.js";
 
 const contactRepository = new SequelizeContactRepository();
 const contactService = new ContactService(contactRepository);
@@ -10,7 +10,28 @@ export const contactController = new Hono();
 
 // GET /contacts - Listar todos os contatos
 contactController.get("/", async (c) => {
-  const contacts = await contactService.findAll();
+  const queryParams = {
+    search: c.req.query("search"),
+    page: c.req.query("page"),
+    limit: c.req.query("limit"),
+  };
+
+  const result = contactQuerySchema.safeParse(queryParams);
+
+  if (!result.success) {
+    const errors = result.error.issues.map((e) => ({
+      field: e.path.join("."),
+      message: e.message,
+    }));
+    return c.json({ errors }, 400);
+  }
+
+  const { search, page, limit } = result.data;
+
+  const contacts = await contactService.findAll(
+    { search },
+    { page, limit }
+  );
   return c.json(contacts);
 });
 

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { LeadService } from "../../service/lead-service.js";
 import { SequelizeLeadRepository } from "../../repositories/sequelize/sequelize-lead.js";
 import type { LeadStatusType } from "../../repositories/repository-lead.js";
-import { createLeadSchema, updateLeadSchema } from "../schemas/lead-schema.js";
+import { createLeadSchema, updateLeadSchema, leadQuerySchema } from "../schemas/lead-schema.js";
 
 const leadRepository = new SequelizeLeadRepository();
 const leadService = new LeadService(leadRepository);
@@ -11,20 +11,35 @@ export const leadController = new Hono();
 
 // GET /leads - Listar todos os leads
 leadController.get("/", async (c) => {
-  const status = c.req.query("status") as LeadStatusType | undefined;
-  const contactId = c.req.query("contactId");
+  const queryParams = {
+    search: c.req.query("search"),
+    status: c.req.query("status"),
+    contactId: c.req.query("contactId"),
+    page: c.req.query("page"),
+    limit: c.req.query("limit"),
+  };
 
-  if (status) {
-    const leads = await leadService.findByStatus(status);
-    return c.json(leads);
+  const result = leadQuerySchema.safeParse(queryParams);
+
+  if (!result.success) {
+    const errors = result.error.issues.map((e) => ({
+      field: e.path.join("."),
+      message: e.message,
+    }));
+    return c.json({ errors }, 400);
   }
+
+  const { search, status, contactId, page, limit } = result.data;
 
   if (contactId) {
     const leads = await leadService.findByContactId(contactId);
     return c.json(leads);
   }
 
-  const leads = await leadService.findAll();
+  const leads = await leadService.findAll(
+    { search, status },
+    { page, limit }
+  );
   return c.json(leads);
 });
 

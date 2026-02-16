@@ -56,5 +56,26 @@ export const updateLeadSchema = z.object({
     .nullable(),
 });
 
+export const leadQuerySchema = z.object({
+  search: z.string().optional(),
+  status: z
+    .enum(["novo", "contactado", "qualificado", "convertido", "perdido"], {
+      message: "Status inválido",
+    })
+    .optional(),
+  contactId: z.string().uuid("O ID do contato deve ser um UUID válido").optional(),
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 1))
+    .pipe(z.number().min(1, "Página deve ser maior que 0")),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 10))
+    .pipe(z.number().min(1, "Limite deve ser maior que 0").max(100, "Limite máximo é 100")),
+});
+
 export type CreateLeadInput = z.infer<typeof createLeadSchema>;
 export type UpdateLeadInput = z.infer<typeof updateLeadSchema>;
+export type LeadQueryInput = z.infer<typeof leadQuerySchema>;

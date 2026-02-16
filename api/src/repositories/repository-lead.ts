@@ -1,5 +1,23 @@
 export type LeadStatusType = "novo" | "contactado" | "qualificado" | "convertido" | "perdido";
 
+export interface LeadFilters {
+  search?: string;
+  status?: LeadStatusType;
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface CreateLeadDTO {
   contactId: string;
   name: string;
@@ -38,7 +56,7 @@ export interface LeadEntity {
 export interface ILeadRepository {
   create(data: CreateLeadDTO): Promise<LeadEntity>;
   findById(id: string): Promise<LeadEntity | null>;
-  findAll(): Promise<LeadEntity[]>;
+  findAll(filters?: LeadFilters, pagination?: PaginationParams): Promise<PaginatedResult<LeadEntity>>;
   update(id: string, data: UpdateLeadDTO): Promise<LeadEntity | null>;
   delete(id: string): Promise<boolean>;
   findByStatus(status: LeadStatusType): Promise<LeadEntity[]>;

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,34 +9,41 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/src/components/ui/dialog"
-import { Button } from "@/src/components/ui/button"
-import { Badge } from "@/src/components/ui/badge"
-import { Plus, User, Building2, Loader2 } from "lucide-react"
-import { useLeads, type Lead } from "../leads/use-leads"
-import { useMoveLeadToStage, type StageWithLeads } from "./use-stages"
+} from "@/src/components/ui/dialog";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
+import { Plus, User, Building2, Loader2 } from "lucide-react";
+import { useLeads, type Lead } from "../leads/use-leads";
+import { useMoveLeadToStage, type StageWithLeads } from "./use-stages";
 
 interface AddLeadToStageDialogProps {
-  stage: StageWithLeads
-  allStages: StageWithLeads[]
+  stage: StageWithLeads;
+  allStages: StageWithLeads[];
 }
 
-export function AddLeadToStageDialog({ stage, allStages }: AddLeadToStageDialogProps) {
-  const [open, setOpen] = useState(false)
-  const { data: leads, isLoading: isLoadingLeads } = useLeads()
-  const moveLeadMutation = useMoveLeadToStage()
+export function AddLeadToStageDialog({
+  stage,
+  allStages,
+}: AddLeadToStageDialogProps) {
+  const [open, setOpen] = useState(false);
+  const { data: leadsResponse, isLoading: isLoadingLeads } = useLeads();
+  const moveLeadMutation = useMoveLeadToStage();
 
   // Filtrar leads que não estão em nenhuma etapa do funil
-  const leadsInFunnel = allStages.flatMap((s) => s.leads?.map((l) => l.id) || [])
-  const availableLeads = leads?.filter((lead) => !leadsInFunnel.includes(lead.id)) || []
+  const leadsInFunnel = allStages.flatMap(
+    (s) => s.leads?.map((l) => l.id) || [],
+  );
+  const availableLeads =
+    leadsResponse?.data?.filter((lead) => !leadsInFunnel.includes(lead.id)) ||
+    [];
 
   const handleAddLead = async (lead: Lead) => {
     await moveLeadMutation.mutateAsync({
       leadId: lead.id,
       stageId: stage.id,
-    })
-    setOpen(false)
-  }
+    });
+    setOpen(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -50,7 +57,7 @@ export function AddLeadToStageDialog({ stage, allStages }: AddLeadToStageDialogP
         <DialogHeader>
           <DialogTitle>Adicionar Lead à Etapa</DialogTitle>
           <DialogDescription>
-            Selecione um lead para adicionar à etapa "{stage.name}"
+            Selecione um lead para adicionar à etapa {stage.name}
           </DialogDescription>
         </DialogHeader>
 
@@ -62,7 +69,9 @@ export function AddLeadToStageDialog({ stage, allStages }: AddLeadToStageDialogP
           ) : availableLeads.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>Nenhum lead disponível para adicionar.</p>
-              <p className="text-sm mt-2">Todos os leads já estão vinculados a alguma etapa deste funil.</p>
+              <p className="text-sm mt-2">
+                Todos os leads já estão vinculados a alguma etapa deste funil.
+              </p>
             </div>
           ) : (
             availableLeads.map((lead) => (
@@ -78,7 +87,9 @@ export function AddLeadToStageDialog({ stage, allStages }: AddLeadToStageDialogP
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <p className="text-sm text-muted-foreground truncate">{lead.company}</p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {lead.company}
+                    </p>
                   </div>
                   {lead.contact && (
                     <p className="text-xs text-muted-foreground mt-1">
@@ -106,5 +117,5 @@ export function AddLeadToStageDialog({ stage, allStages }: AddLeadToStageDialogP
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

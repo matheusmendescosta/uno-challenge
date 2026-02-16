@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation"
 import { useFunnel } from "./use-funnels"
 import { useStagesByFunnel, useMoveLeadToStage, type StageWithLeads } from "./use-stages"
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Card, CardContent } from "@/src/components/ui/card"
 import { Skeleton } from "@/src/components/ui/skeleton"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
@@ -11,6 +11,7 @@ import { ArrowLeft, GripVertical, Building2, User } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { AddLeadToStageDialog } from "./AddLeadToStageDialog"
+import { AddStageDialog } from "./AddStageDialog"
 
 interface KanbanColumnProps {
   stage: StageWithLeads
@@ -24,7 +25,7 @@ interface KanbanColumnProps {
 const KanbanColumn = ({ stage, allStages, onDragStart, onDragOver, onDrop, isDragging }: KanbanColumnProps) => {
   return (
     <div
-      className={`flex flex-col min-w-[300px] max-w-[300px] bg-muted/30 rounded-lg border ${
+      className={`flex flex-col min-w-75 max-w-75 bg-muted/30 rounded-lg border ${
         isDragging ? "border-primary border-dashed" : "border-border"
       }`}
       onDragOver={onDragOver}
@@ -130,9 +131,9 @@ const FunnelKanbanPage = () => {
           </div>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-4">
-          <Skeleton className="h-96 min-w-[300px]" />
-          <Skeleton className="h-96 min-w-[300px]" />
-          <Skeleton className="h-96 min-w-[300px]" />
+          <Skeleton className="h-96 min-w-75" />
+          <Skeleton className="h-96 min-w-75" />
+          <Skeleton className="h-96 min-w-75" />
         </div>
       </div>
     )
@@ -175,30 +176,18 @@ const FunnelKanbanPage = () => {
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {sortedStages.length === 0 ? (
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Nenhuma etapa cadastrada</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Este funil ainda não possui etapas. Adicione etapas para começar a usar o Kanban.
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          sortedStages.map((stage) => (
-            <KanbanColumn
-              key={stage.id}
-              stage={stage}
-              allStages={sortedStages}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              isDragging={draggedLead !== null}
-            />
-          ))
-        )}
+        {sortedStages.map((stage) => (
+          <KanbanColumn
+            key={stage.id}
+            stage={stage}
+            allStages={sortedStages}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            isDragging={draggedLead !== null}
+          />
+        ))}
+        <AddStageDialog funnelId={funnelId} existingStages={sortedStages} />
       </div>
     </div>
   )

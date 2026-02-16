@@ -1,11 +1,15 @@
 import { Lead, LeadStatus } from "../../../models/lead.js";
 import { Contact } from "../../../models/contact.js";
+import { Op } from "sequelize";
 import type {
   ILeadRepository,
   CreateLeadDTO,
   UpdateLeadDTO,
   LeadEntity,
   LeadStatusType,
+  LeadFilters,
+  PaginationParams,
+  PaginatedResult,
 } from "../repository-lead.js";
 
 export class SequelizeLeadRepository implements ILeadRepository {
@@ -45,11 +49,42 @@ export class SequelizeLeadRepository implements ILeadRepository {
     return lead ? this.toEntity(lead) : null;
   }
 
-  async findAll(): Promise<LeadEntity[]> {
-    const leads = await Lead.findAll({
+  async findAll(
+    filters?: LeadFilters,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<LeadEntity>> {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const offset = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    if (filters?.search) {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${filters.search}%` } },
+        { company: { [Op.iLike]: `%${filters.search}%` } },
+      ];
+    }
+
+    const { rows, count } = await Lead.findAndCountAll({
+      where,
       include: [{ model: Contact, as: "contact" }],
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
     });
-    return leads.map((lead) => this.toEntity(lead));
+
+    return {
+      data: rows.map((lead) => this.toEntity(lead)),
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    };
   }
 
   async update(id: string, data: UpdateLeadDTO): Promise<LeadEntity | null> {

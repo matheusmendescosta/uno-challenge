@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
 
-import { Button } from "@/src/components/ui/button"
+import { Button } from "@/src/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/src/components/ui/card"
+} from "@/src/components/ui/card";
 import {
   Form,
   FormControl,
@@ -20,27 +20,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/src/components/ui/form"
-import { Input } from "@/src/components/ui/input"
+} from "@/src/components/ui/form";
+import { Input } from "@/src/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/src/components/ui/select"
-import { useCreateLead, LeadStatus } from "./use-create-lead"
-import { useContacts } from "../contacts/use-contacts"
-import { Skeleton } from "@/src/components/ui/skeleton"
+} from "@/src/components/ui/select";
+import { useCreateLead, LeadStatus } from "./use-create-lead";
+import { useContacts } from "../contacts/use-contacts";
+import { Skeleton } from "@/src/components/ui/skeleton";
 
 const formSchema = z.object({
   contactId: z.string().min(1, "Selecione um contato"),
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   company: z.string().min(2, "Empresa deve ter pelo menos 2 caracteres"),
   status: z.nativeEnum(LeadStatus),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 const statusLabels: Record<LeadStatus, string> = {
   [LeadStatus.NOVO]: "Novo",
@@ -48,12 +48,12 @@ const statusLabels: Record<LeadStatus, string> = {
   [LeadStatus.QUALIFICADO]: "Qualificado",
   [LeadStatus.CONVERTIDO]: "Convertido",
   [LeadStatus.PERDIDO]: "Perdido",
-}
+};
 
 const NewLeadPage = () => {
-  const router = useRouter()
-  const { mutate: createLead, isPending } = useCreateLead()
-  const { data: contacts, isLoading: isLoadingContacts } = useContacts()
+  const router = useRouter();
+  const { mutate: createLead, isPending } = useCreateLead();
+  const { data: contacts, isLoading: isLoadingContacts } = useContacts();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -63,14 +63,14 @@ const NewLeadPage = () => {
       company: "",
       status: LeadStatus.NOVO,
     },
-  })
+  });
 
   function onSubmit(values: FormValues) {
     createLead(values, {
       onSuccess: () => {
-        router.push("/leads")
+        router.push("/leads");
       },
-    })
+    });
   }
 
   return (
@@ -93,14 +93,17 @@ const NewLeadPage = () => {
                   {isLoadingContacts ? (
                     <Skeleton className="h-9 w-full" />
                   ) : (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione um contato" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {contacts?.map((contact) => (
+                        {contacts?.data?.map((contact) => (
                           <SelectItem key={contact.id} value={contact.id}>
                             {contact.name} - {contact.email}
                           </SelectItem>
@@ -147,7 +150,10 @@ const NewLeadPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o status" />
@@ -182,7 +188,7 @@ const NewLeadPage = () => {
         </Form>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default NewLeadPage
+export default NewLeadPage;

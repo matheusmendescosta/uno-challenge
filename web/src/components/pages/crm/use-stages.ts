@@ -18,6 +18,13 @@ export interface StageWithLeads {
   leads?: LeadInStage[]
 }
 
+export interface CreateStageInput {
+  funnelId: string
+  name: string
+  order?: number
+  color?: string
+}
+
 async function fetchStageWithLeads(stageId: string): Promise<StageWithLeads> {
   const response = await fetch(`http://localhost:3333/stages/${stageId}`)
 
@@ -33,6 +40,22 @@ async function fetchStagesByFunnel(funnelId: string): Promise<StageWithLeads[]> 
 
   if (!response.ok) {
     throw new Error("Erro ao buscar etapas")
+  }
+
+  return response.json()
+}
+
+async function createStage(data: CreateStageInput): Promise<StageWithLeads> {
+  const response = await fetch("http://localhost:3333/stages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+
+  if (!response.ok) {
+    throw new Error("Erro ao criar etapa")
   }
 
   return response.json()
@@ -77,6 +100,17 @@ export function useMoveLeadToStage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stages"] })
       queryClient.invalidateQueries({ queryKey: ["leads"] })
+    },
+  })
+}
+
+export function useCreateStage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createStage,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["stages", "funnel", data.funnelId] })
     },
   })
 }

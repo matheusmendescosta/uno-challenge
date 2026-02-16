@@ -4,6 +4,9 @@ import type {
   UpdateLeadDTO,
   LeadEntity,
   LeadStatusType,
+  LeadFilters,
+  PaginationParams,
+  PaginatedResult,
 } from "../repositories/repository-lead.js";
 
 export class LeadService {
@@ -17,8 +20,11 @@ export class LeadService {
     return this.leadRepository.findById(id);
   }
 
-  async findAll(): Promise<LeadEntity[]> {
-    return this.leadRepository.findAll();
+  async findAll(
+    filters?: LeadFilters,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResult<LeadEntity>> {
+    return this.leadRepository.findAll(filters, pagination);
   }
 
   async update(id: string, data: UpdateLeadDTO): Promise<LeadEntity | null> {
