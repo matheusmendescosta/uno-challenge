@@ -1,4 +1,5 @@
 import { Lead, LeadStatus } from "../../../models/lead.js";
+import { Contact } from "../../../models/contact.js";
 import type {
   ILeadRepository,
   CreateLeadDTO,
@@ -9,7 +10,7 @@ import type {
 
 export class SequelizeLeadRepository implements ILeadRepository {
   private toEntity(lead: Lead): LeadEntity {
-    const data = lead.get({ plain: true });
+    const data = lead.get({ plain: true }) as any;
     return {
       id: data.id,
       contactId: data.contactId,
@@ -18,6 +19,12 @@ export class SequelizeLeadRepository implements ILeadRepository {
       status: data.status as LeadStatusType,
       createdAt: data.createdAt ?? new Date(),
       updatedAt: data.updatedAt ?? new Date(),
+      contact: data.contact ? {
+        id: data.contact.id,
+        name: data.contact.name,
+        email: data.contact.email,
+        phone: data.contact.phone,
+      } : undefined,
     };
   }
 
@@ -37,7 +44,9 @@ export class SequelizeLeadRepository implements ILeadRepository {
   }
 
   async findAll(): Promise<LeadEntity[]> {
-    const leads = await Lead.findAll();
+    const leads = await Lead.findAll({
+      include: [{ model: Contact, as: "contact" }],
+    });
     return leads.map((lead) => this.toEntity(lead));
   }
 

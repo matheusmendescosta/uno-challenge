@@ -14,6 +14,13 @@ export interface UpdateLeadDTO {
   status?: LeadStatusType;
 }
 
+export interface ContactEntity {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export interface LeadEntity {
   id: string;
   contactId: string;
@@ -22,6 +29,7 @@ export interface LeadEntity {
   status: LeadStatusType;
   createdAt: Date;
   updatedAt: Date;
+  contact?: ContactEntity;
 }
 
 export interface ILeadRepository {
