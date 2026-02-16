@@ -24,6 +24,11 @@ export const createLeadSchema = z.object({
     .enum(["novo", "contactado", "qualificado", "convertido", "perdido"], { message: "Status inválido" })
     .optional()
     .default("novo"),
+  stageId: z
+    .string()
+    .uuid("O ID da etapa deve ser um UUID válido")
+    .optional()
+    .nullable(),
 });
 
 export const updateLeadSchema = z.object({
@@ -44,6 +49,11 @@ export const updateLeadSchema = z.object({
   status: z
     .enum(["novo", "contactado", "qualificado", "convertido", "perdido"], { message: "Status inválido" })
     .optional(),
+  stageId: z
+    .string()
+    .uuid("O ID da etapa deve ser um UUID válido")
+    .optional()
+    .nullable(),
 });
 
 export type CreateLeadInput = z.infer<typeof createLeadSchema>;

@@ -1,5 +1,6 @@
 import { Model, DataTypes, Sequelize, type Optional } from "sequelize";
 import { Contact } from "./contact.js";
+import type { Stage } from "./stage.js";
 
 export enum LeadStatus {
   NOVO = "novo",
@@ -12,6 +13,7 @@ export enum LeadStatus {
 interface LeadAttributes {
   id: string;
   contactId: string;
+  stageId?: string | null;
   name: string;
   company: string;
   status: LeadStatus;
@@ -27,6 +29,7 @@ export class Lead
 {
   public id!: string;
   public contactId!: string;
+  public stageId!: string | null;
   public name!: string;
   public company!: string;
   public status!: LeadStatus;
@@ -35,11 +38,16 @@ export class Lead
   public readonly updatedAt!: Date;
 
   public readonly contact?: Contact;
+  public readonly stage?: Stage;
 
   static associate(models: any) {
     Lead.belongsTo(models.Contact, {
       foreignKey: "contactId",
       as: "contact",
+    });
+    Lead.belongsTo(models.Stage, {
+      foreignKey: "stageId",
+      as: "stage",
     });
   }
 }
@@ -58,6 +66,10 @@ export const initLead = (sequelize: Sequelize) => {
         validate: {
           notNull: { msg: "O ID do contato é obrigatório" },
         },
+      },
+      stageId: {
+        type: DataTypes.UUID,
+        allowNull: true,
       },
       name: {
         type: DataTypes.STRING,

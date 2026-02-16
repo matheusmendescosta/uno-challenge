@@ -5,6 +5,7 @@ export interface CreateLeadDTO {
   name: string;
   company: string;
   status?: LeadStatusType;
+  stageId?: string | null;
 }
 
 export interface UpdateLeadDTO {
@@ -12,6 +13,7 @@ export interface UpdateLeadDTO {
   name?: string;
   company?: string;
   status?: LeadStatusType;
+  stageId?: string | null;
 }
 
 export interface ContactEntity {
@@ -24,6 +26,7 @@ export interface ContactEntity {
 export interface LeadEntity {
   id: string;
   contactId: string;
+  stageId?: string | null;
   name: string;
   company: string;
   status: LeadStatusType;

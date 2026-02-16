@@ -1,6 +1,8 @@
 import { Sequelize } from "sequelize";
 import { initLead, Lead } from "../../models/lead.js";
 import { initContact, Contact } from "../../models/contact.js";
+import { initFunnel, Funnel } from "../../models/funnel.js";
+import { initStage, Stage } from "../../models/stage.js";
 
 export const sequelize = new Sequelize({
   dialect: "postgres",
@@ -12,11 +14,15 @@ export const sequelize = new Sequelize({
 });
 
 initContact(sequelize);
+initFunnel(sequelize);
+initStage(sequelize);
 initLead(sequelize);
 
-const models = { Lead, Contact };
+const models = { Lead, Contact, Funnel, Stage };
 Lead.associate(models);
 Contact.associate(models);
+Funnel.associate(models);
+Stage.associate(models);
 
 export const connectDB = async () => {
   try {

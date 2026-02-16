@@ -14,6 +14,7 @@ export class SequelizeLeadRepository implements ILeadRepository {
     return {
       id: data.id,
       contactId: data.contactId,
+      stageId: data.stageId,
       name: data.name,
       company: data.company,
       status: data.status as LeadStatusType,
@@ -34,6 +35,7 @@ export class SequelizeLeadRepository implements ILeadRepository {
       name: data.name,
       company: data.company,
       status: (data.status ?? "novo") as LeadStatus,
+      stageId: data.stageId,
     });
     return this.toEntity(lead);
   }
