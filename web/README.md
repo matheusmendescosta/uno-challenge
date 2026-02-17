@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web - Frontend
 
-## Getting Started
+Frontend desenvolvido com [Next.js 16](https://nextjs.org/), [React 19](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/) e [shadcn/ui](https://ui.shadcn.com/).
 
-First, run the development server:
+## Requisitos
+
+- Node.js 20+
+- npm, yarn, pnpm ou bun
+- API backend rodando (porta 3333)
+
+## Variáveis de Ambiente
+
+Crie um arquivo `.env.local` na raiz da pasta `web/` (opcional):
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3333
+```
+
+## Instalação
+
+```bash
+npm install
+```
+
+## Rodando em Desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts Disponíveis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Inicia o servidor de desenvolvimento com hot-reload |
+| `npm run build` | Compila o projeto para produção |
+| `npm start` | Inicia o servidor em modo produção |
+| `npm run lint` | Executa o ESLint para verificar o código |
 
-## Learn More
+## Estrutura do Projeto
 
-To learn more about Next.js, take a look at the following resources:
+```
+web/
+├── public/              # Arquivos estáticos
+└── src/
+    ├── app/             # Rotas do Next.js (App Router)
+    │   ├── contacts/    # Páginas de contatos
+    │   ├── crm/         # Páginas do CRM (funis)
+    │   └── leads/       # Páginas de leads
+    ├── components/
+    │   ├── content/     # Componentes de layout (sidebar)
+    │   ├── pages/       # Componentes específicos de páginas
+    │   └── ui/          # Componentes UI reutilizáveis (shadcn)
+    ├── dto/             # Data Transfer Objects
+    ├── hooks/           # Custom hooks
+    ├── lib/             # Utilitários
+    └── providers/       # Context providers (React Query)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Páginas Disponíveis
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Rota | Descrição |
+|------|-----------|
+| `/` | Dashboard principal |
+| `/leads` | Listagem de leads |
+| `/leads/new` | Criar novo lead |
+| `/leads/[id]` | Editar lead |
+| `/contacts` | Listagem de contatos |
+| `/contacts/new` | Criar novo contato |
+| `/contacts/[id]` | Editar contato |
+| `/crm` | Listagem de funis |
+| `/crm/new` | Criar novo funil |
+| `/crm/[funnelId]` | Visualizar/Editar funil |
 
-## Deploy on Vercel
+## Tecnologias Principais
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 16** - Framework React com App Router
+- **React 19** - Biblioteca UI
+- **Tailwind CSS 4** - Estilização
+- **shadcn/ui** - Componentes UI
+- **React Query** - Gerenciamento de estado do servidor
+- **React Hook Form + Zod** - Formulários e validação
+- **Lucide React** - Ícones
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Build para Produção
+
+```bash
+npm run build
+npm start
+```
+
+## Deploy
+
+A forma mais fácil de fazer deploy é usar a [Vercel](https://vercel.com/new):
+
+```bash
+npx vercel
+```
+
+Consulte a [documentação de deployment do Next.js](https://nextjs.org/docs/app/building-your-application/deploying) para mais detalhes.
