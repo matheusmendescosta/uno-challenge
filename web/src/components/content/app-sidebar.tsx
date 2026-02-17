@@ -121,7 +121,7 @@ const data = {
       url: "/crm",
       icon: SquareTerminal,
       items: [
-        { title: "Funil de Vendas", url: "/crm" },
+        { title: "Funil", url: "/crm" },
         { title: "Novo Funil", url: "/crm/new" },
       ],
     },
