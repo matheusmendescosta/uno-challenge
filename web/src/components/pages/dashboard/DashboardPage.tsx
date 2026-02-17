@@ -149,26 +149,35 @@ const DashboardPage = () => {
               </p>
             ) : (
               <div className="space-y-4">
-                {recentLeads.map((lead) => (
-                  <div
-                    key={lead.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {lead.name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {lead.company}
-                      </p>
+                {recentLeads.map((lead, index) => {
+                  const recentLead = lead as {
+                    id?: string | number;
+                    name?: string;
+                    company?: string;
+                    status: LeadStatus;
+                  };
+
+                  return (
+                    <div
+                      key={recentLead.id ?? `${recentLead.status}-${index}`}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {recentLead.name ?? "Lead sem nome"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {recentLead.company ?? "Empresa não informada"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={statusColors[recentLead.status]}>
+                          {statusLabels[recentLead.status]}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={statusColors[lead.status]}>
-                        {statusLabels[lead.status]}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
