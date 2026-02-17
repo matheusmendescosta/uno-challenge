@@ -1,0 +1,45 @@
+# Stage 1: Instalar dependências
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+
+RUN npm ci --only=production && \
+    cp -R node_modules prod_node_modules && \
+    npm ci
+
+# Stage 2: Build da aplicação
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN npm run build
+
+# Stage 3: Imagem de produção
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 api
+
+COPY --from=deps /app/prod_node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+
+# Copiar arquivos necessários para migrations/seeders (se necessário em runtime)
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/seeders ./seeders
+COPY --from=builder /app/models ./models
+COPY --from=builder /app/.sequelizerc ./.sequelizerc
+
+USER api
+
+EXPOSE 3333
+
+CMD ["node", "dist/index.js"]
