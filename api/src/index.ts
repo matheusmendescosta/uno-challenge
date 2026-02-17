@@ -35,6 +35,10 @@ app.get(
         }),
       );
     },
+    onMessage: (event, ws) => {
+      const message = typeof event.data === "string" ? event.data : event.data.toString();
+      wsManager.handleClientMessage(ws, message);
+    },
     onClose: (_event, ws) => {
       wsManager.removeConnection(ws);
     },

@@ -8,7 +8,10 @@ export type WebSocketEventType =
   | "lead:deleted"
   | "stage:created"
   | "stage:updated"
-  | "stage:deleted";
+  | "stage:deleted"
+  | "cursor:move"
+  | "cursor:enter"
+  | "cursor:leave";
 
 export interface WebSocketEvent {
   type: WebSocketEventType;
@@ -34,6 +37,36 @@ class WebSocketManager {
     console.log(
       `[WebSocket] Conexão encerrada. Total: ${this.connections.size} conexões`,
     );
+  }
+
+  // Processa mensagem recebida do cliente (para cursores)
+  handleClientMessage(senderWs: WSContext, message: string) {
+    try {
+      const data = JSON.parse(message);
+      
+      // Tipos de cursor que devem ser retransmitidos para outros clientes
+      if (["cursor:move", "cursor:enter", "cursor:leave"].includes(data.type)) {
+        this.broadcastExcept(senderWs, data);
+      }
+    } catch (error) {
+      console.error("[WebSocket] Erro ao processar mensagem do cliente:", error);
+    }
+  }
+
+  // Envia evento para todas as conexões exceto o remetente
+  broadcastExcept(senderWs: WSContext, event: unknown) {
+    const message = JSON.stringify(event);
+    
+    for (const ws of this.connections) {
+      if (ws !== senderWs) {
+        try {
+          ws.send(message);
+        } catch (error) {
+          console.error("[WebSocket] Erro ao enviar mensagem:", error);
+          this.removeConnection(ws);
+        }
+      }
+    }
   }
 
   // Envia evento para todas as conexões

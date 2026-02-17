@@ -11,7 +11,10 @@ export type WebSocketEventType =
   | "lead:deleted"
   | "stage:created"
   | "stage:updated"
-  | "stage:deleted";
+  | "stage:deleted"
+  | "cursor:move"
+  | "cursor:enter"
+  | "cursor:leave";
 
 export interface WebSocketEvent {
   type: WebSocketEventType;
@@ -32,6 +35,7 @@ interface UseWebSocketReturn {
   isConnected: boolean;
   lastEvent: WebSocketEvent | null;
   reconnect: () => void;
+  sendMessage: (message: unknown) => void;
 }
 
 const DEFAULT_WS_URL = env.WS_URL;
@@ -133,6 +137,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     connect();
   }, [connect]);
 
+  const sendMessage = useCallback((message: unknown) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+    }
+  }, []);
+
   useEffect(() => {
     connect();
 
@@ -153,5 +163,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     isConnected,
     lastEvent,
     reconnect,
+    sendMessage,
   };
 }

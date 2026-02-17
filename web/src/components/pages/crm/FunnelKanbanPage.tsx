@@ -7,12 +7,14 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import { Skeleton } from "@/src/components/ui/skeleton"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
-import { ArrowLeft, GripVertical, Building2, User } from "lucide-react"
+import { ArrowLeft, GripVertical, Building2, User, Users } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { AddLeadToStageDialog } from "./AddLeadToStageDialog"
 import { AddStageDialog } from "./AddStageDialog"
 import { WebSocketStatus } from "@/src/components/ui/websocket-status"
+import { useCollaborativeCursors } from "./use-collaborative-cursors"
+import { CollaborativeCursorsOverlay } from "./CollaborativeCursor"
 
 interface KanbanColumnProps {
   stage: StageWithLeads
@@ -95,6 +97,15 @@ const FunnelKanbanPage = () => {
 
   const [draggedLead, setDraggedLead] = useState<{ leadId: string; sourceStageId: string } | null>(null)
 
+  // Hook para cursores colaborativos
+  const {
+    cursors,
+    containerRef,
+    handleMouseMove,
+    handleMouseLeave,
+    handleMouseEnter,
+  } = useCollaborativeCursors(funnelId)
+
   const handleDragStart = (e: React.DragEvent, leadId: string, sourceStageId: string) => {
     setDraggedLead({ leadId, sourceStageId })
     e.dataTransfer.effectAllowed = "move"
@@ -174,10 +185,27 @@ const FunnelKanbanPage = () => {
             {funnel?.description || "Arraste os leads entre as etapas para atualizar o progresso"}
           </p>
         </div>
+        {/* Indicador de usuários online */}
+        {cursors.length > 0 && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Users className="h-4 w-4" />
+            <span>{cursors.length} online</span>
+          </div>
+        )}
         <WebSocketStatus />
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      {/* Container com tracking do mouse */}
+      <div
+        ref={containerRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onMouseEnter={handleMouseEnter}
+        className="relative flex gap-4 overflow-x-auto pb-4"
+      >
+        {/* Overlay de cursores colaborativos */}
+        <CollaborativeCursorsOverlay cursors={cursors} />
+
         {sortedStages.map((stage) => (
           <KanbanColumn
             key={stage.id}
