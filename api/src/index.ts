@@ -63,10 +63,11 @@ connectDB().then(() => {
     {
       fetch: app.fetch,
       port: env.API_PORT,
+      hostname: "0.0.0.0",
     },
     (info) => {
-      console.log(`Server is running on http://localhost:${info.port}`);
-      console.log(`WebSocket available at ws://localhost:${info.port}/ws`);
+      console.log(`Server is running on http://0.0.0.0:${info.port}`);
+      console.log(`WebSocket available at ws://0.0.0.0:${info.port}/ws`);
     },
   );
 
