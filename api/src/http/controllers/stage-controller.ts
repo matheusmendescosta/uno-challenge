@@ -9,6 +9,7 @@ import {
   reorderStagesSchema,
   moveLeadToStageSchema,
 } from "../schemas/stage-schema.js";
+import { wsManager } from "../../lib/websocket.js";
 
 const stageRepository = new SequelizeStageRepository();
 const stageService = new StageService(stageRepository);
@@ -57,6 +58,10 @@ stageController.post("/", async (c) => {
 
   try {
     const stage = await stageService.create(result.data);
+
+    // Emite evento WebSocket
+    wsManager.emitStageCreated(stage.id, stage.funnelId);
+
     return c.json(stage, 201);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro ao criar etapa";
@@ -85,6 +90,9 @@ stageController.put("/:id", async (c) => {
       return c.json({ error: "Etapa não encontrada" }, 404);
     }
 
+    // Emite evento WebSocket
+    wsManager.emitStageUpdated(stage.id, stage.funnelId);
+
     return c.json(stage);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro ao atualizar etapa";
@@ -95,11 +103,21 @@ stageController.put("/:id", async (c) => {
 // DELETE /stages/:id - Deletar etapa
 stageController.delete("/:id", async (c) => {
   const id = c.req.param("id");
+
+  // Busca a etapa antes de deletar para obter o funnelId
+  const stageToDelete = await stageService.findById(id);
+  if (!stageToDelete) {
+    return c.json({ error: "Etapa não encontrada" }, 404);
+  }
+
   const deleted = await stageService.delete(id);
 
   if (!deleted) {
-    return c.json({ error: "Etapa não encontrada" }, 404);
+    return c.json({ error: "Erro ao deletar etapa" }, 500);
   }
+
+  // Emite evento WebSocket
+  wsManager.emitStageDeleted(id, stageToDelete.funnelId);
 
   return c.json({ message: "Etapa deletada com sucesso" });
 });
@@ -153,12 +171,18 @@ stageController.post("/move-lead", async (c) => {
   try {
     const { leadId, stageId } = result.data;
 
-    // Verify stage exists if stageId is provided
+    // Busca o lead atual para obter o stageId anterior
+    const currentLead = await leadService.findById(leadId);
+    const fromStageId = currentLead?.stageId ?? null;
+
+    // Busca o stage de destino para obter o funnelId
+    let funnelId: string | undefined;
     if (stageId) {
       const stage = await stageService.findById(stageId);
       if (!stage) {
         return c.json({ error: "Etapa não encontrada" }, 404);
       }
+      funnelId = stage.funnelId;
     }
 
     const lead = await leadService.update(leadId, { stageId });
@@ -166,6 +190,14 @@ stageController.post("/move-lead", async (c) => {
     if (!lead) {
       return c.json({ error: "Lead não encontrado" }, 404);
     }
+
+    // Emite evento WebSocket para atualização em tempo real
+    wsManager.emitLeadMoved({
+      leadId,
+      fromStageId,
+      toStageId: stageId,
+      funnelId,
+    });
 
     return c.json(lead);
   } catch (error) {

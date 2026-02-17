@@ -12,6 +12,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { AddLeadToStageDialog } from "./AddLeadToStageDialog"
 import { AddStageDialog } from "./AddStageDialog"
+import { WebSocketStatus } from "@/src/components/ui/websocket-status"
 
 interface KanbanColumnProps {
   stage: StageWithLeads
@@ -167,12 +168,13 @@ const FunnelKanbanPage = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="text-3xl font-bold">{funnel?.name}</h1>
           <p className="text-muted-foreground">
             {funnel?.description || "Arraste os leads entre as etapas para atualizar o progresso"}
           </p>
         </div>
+        <WebSocketStatus />
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4">

@@ -101,6 +101,15 @@ npm run dev
 - [x] Visualização de funil com quadro Kanban de estágios
 - [x] Gerenciamento de estágios dentro do funil
 
+#### WebSocket - Atualizações em Tempo Real (Feature Extra)
+
+- [x] **WS /ws** - Conexão WebSocket para atualizações em tempo real
+- [x] **GET /ws/status** - Verificar status das conexões WebSocket
+- [x] Eventos emitidos:
+  - `lead:moved` - Quando um lead é movido entre estágios
+  - `lead:created`, `lead:updated`, `lead:deleted` - CRUD de leads
+  - `stage:created`, `stage:updated`, `stage:deleted` - CRUD de estágios
+
 ---
 
 ## ⭐ Diferenciais Implementados
@@ -114,6 +123,7 @@ npm run dev
 - [x] **Banco de dados PostgreSQL** (ao invés de persistência em memória)
 - [x] **Docker** para facilitar o setup do ambiente
 - [x] **Sistema de Funis/CRM** com estágios (feature extra não solicitada)
+- [x] **WebSocket** para atualizações em tempo real do Kanban
 
 ---
 
@@ -124,6 +134,7 @@ npm run dev
 | Tecnologia | Uso |
 |------------|-----|
 | Hono | Framework HTTP |
+| @hono/node-ws | WebSocket middleware |
 | TypeScript | Linguagem |
 | Zod | Validação de dados |
 | Sequelize | ORM |
@@ -191,3 +202,7 @@ web/
 - As migrations e seeders estão configurados para popular o banco com dados de exemplo
 - O frontend utiliza React Query para cache e sincronização de dados com a API
 - Todas as validações são feitas tanto no frontend quanto no backend com Zod
+- **WebSocket** implementado com `@hono/node-ws` para atualizações em tempo real
+  - O frontend conecta automaticamente ao WebSocket e mostra indicador de status
+  - Quando um usuário move um lead no Kanban, todos os outros usuários veem a atualização instantaneamente
+  - Reconexão automática em caso de desconexão
