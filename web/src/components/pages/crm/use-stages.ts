@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { env } from "@/src/lib/env"
 
 export interface LeadInStage {
   id: string
@@ -26,7 +27,7 @@ export interface CreateStageInput {
 }
 
 async function fetchStageWithLeads(stageId: string): Promise<StageWithLeads> {
-  const response = await fetch(`http://localhost:3333/stages/${stageId}`)
+  const response = await fetch(`${env.API_URL}/stages/${stageId}`)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar etapa")
@@ -36,7 +37,7 @@ async function fetchStageWithLeads(stageId: string): Promise<StageWithLeads> {
 }
 
 async function fetchStagesByFunnel(funnelId: string): Promise<StageWithLeads[]> {
-  const response = await fetch(`http://localhost:3333/stages?funnelId=${funnelId}`)
+  const response = await fetch(`${env.API_URL}/stages?funnelId=${funnelId}`)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar etapas")
@@ -46,7 +47,7 @@ async function fetchStagesByFunnel(funnelId: string): Promise<StageWithLeads[]> 
 }
 
 async function createStage(data: CreateStageInput): Promise<StageWithLeads> {
-  const response = await fetch("http://localhost:3333/stages", {
+  const response = await fetch(`${env.API_URL}/stages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -62,7 +63,7 @@ async function createStage(data: CreateStageInput): Promise<StageWithLeads> {
 }
 
 async function moveLeadToStage(leadId: string, stageId: string | null): Promise<void> {
-  const response = await fetch("http://localhost:3333/stages/move-lead", {
+  const response = await fetch(`${env.API_URL}/stages/move-lead`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

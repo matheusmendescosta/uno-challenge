@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { env } from "@/src/lib/env"
 
 export enum LeadStatus {
   NOVO = "novo",
@@ -61,7 +62,7 @@ async function fetchLeads(params: LeadsQueryParams = {}): Promise<PaginatedLeads
   }
 
   const queryString = searchParams.toString()
-  const url = `http://localhost:3333/leads${queryString ? `?${queryString}` : ""}`
+  const url = `${env.API_URL}/leads${queryString ? `?${queryString}` : ""}`
 
   const response = await fetch(url)
 
@@ -80,7 +81,7 @@ export function useLeads(params: LeadsQueryParams = {}) {
 }
 
 async function fetchLead(id: string): Promise<Lead> {
-  const response = await fetch(`http://localhost:3333/leads/${id}`)
+  const response = await fetch(`${env.API_URL}/leads/${id}`)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar lead")
@@ -98,7 +99,7 @@ export function useLead(id: string) {
 }
 
 async function updateLead(id: string, data: UpdateLeadInput): Promise<Lead> {
-  const response = await fetch(`http://localhost:3333/leads/${id}`, {
+  const response = await fetch(`${env.API_URL}/leads/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export function useUpdateLead() {
 }
 
 async function deleteLead(id: string): Promise<void> {
-  const response = await fetch(`http://localhost:3333/leads/${id}`, {
+  const response = await fetch(`${env.API_URL}/leads/${id}`, {
     method: "DELETE",
   })
 

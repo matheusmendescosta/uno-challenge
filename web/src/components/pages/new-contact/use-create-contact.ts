@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { env } from "@/src/lib/env";
 
 export interface CreateContactInput {
   name: string;
@@ -14,7 +15,7 @@ export interface Contact {
 }
 
 async function createContact(data: CreateContactInput): Promise<Contact> {
-  const response = await fetch("http://localhost:3333/contacts", {
+  const response = await fetch(`${env.API_URL}/contacts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

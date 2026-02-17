@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { env } from "@/src/lib/env"
 
 export interface Contact {
   id: string
@@ -41,7 +42,7 @@ async function fetchContacts(params: ContactsQueryParams = {}): Promise<Paginate
   }
 
   const queryString = searchParams.toString()
-  const url = `http://localhost:3333/contacts${queryString ? `?${queryString}` : ""}`
+  const url = `${env.API_URL}/contacts${queryString ? `?${queryString}` : ""}`
 
   const response = await fetch(url)
   
@@ -60,7 +61,7 @@ export function useContacts(params: ContactsQueryParams = {}) {
 }
 
 async function fetchContact(id: string): Promise<Contact> {
-  const response = await fetch(`http://localhost:3333/contacts/${id}`)
+  const response = await fetch(`${env.API_URL}/contacts/${id}`)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar contato")
@@ -78,7 +79,7 @@ export function useContact(id: string) {
 }
 
 async function updateContact(id: string, data: UpdateContactInput): Promise<Contact> {
-  const response = await fetch(`http://localhost:3333/contacts/${id}`, {
+  const response = await fetch(`${env.API_URL}/contacts/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -106,7 +107,7 @@ export function useUpdateContact() {
 }
 
 async function deleteContact(id: string): Promise<void> {
-  const response = await fetch(`http://localhost:3333/contacts/${id}`, {
+  const response = await fetch(`${env.API_URL}/contacts/${id}`, {
     method: "DELETE",
   })
 

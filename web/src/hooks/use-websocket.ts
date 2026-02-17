@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
+import { env } from "@/src/lib/env";
 
 export type WebSocketEventType =
   | "connected"
@@ -33,7 +34,7 @@ interface UseWebSocketReturn {
   reconnect: () => void;
 }
 
-const DEFAULT_WS_URL = "ws://localhost:3333/ws";
+const DEFAULT_WS_URL = env.WS_URL;
 const DEFAULT_RECONNECT_DELAY = 3000;
 const DEFAULT_MAX_RECONNECT_ATTEMPTS = 10;
 

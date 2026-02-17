@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { env } from "@/src/lib/env"
 
 export enum LeadStatus {
   NOVO = "novo",
@@ -24,7 +25,7 @@ export interface Lead {
 }
 
 async function createLead(data: CreateLeadInput): Promise<Lead> {
-  const response = await fetch("http://localhost:3333/leads", {
+  const response = await fetch(`${env.API_URL}/leads`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

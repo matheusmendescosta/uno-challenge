@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { env } from "@/src/lib/env";
 
 export interface CreateFunnelInput {
   name: string;
@@ -14,7 +15,7 @@ export interface Funnel {
 }
 
 async function createFunnel(data: CreateFunnelInput): Promise<Funnel> {
-  const response = await fetch("http://localhost:3333/funnels", {
+  const response = await fetch(`${env.API_URL}/funnels`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

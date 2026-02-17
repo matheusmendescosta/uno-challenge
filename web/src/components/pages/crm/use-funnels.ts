@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { env } from "@/src/lib/env"
 
 export interface Stage {
   id: string
@@ -20,7 +21,7 @@ export interface Funnel {
 }
 
 async function fetchFunnels(): Promise<Funnel[]> {
-  const response = await fetch("http://localhost:3333/funnels")
+  const response = await fetch(`${env.API_URL}/funnels`)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar funis")
@@ -30,7 +31,7 @@ async function fetchFunnels(): Promise<Funnel[]> {
 }
 
 async function fetchFunnelById(id: string): Promise<Funnel> {
-  const response = await fetch(`http://localhost:3333/funnels/${id}`)
+  const response = await fetch(`${env.API_URL}/funnels/${id}`)
 
   if (!response.ok) {
     throw new Error("Erro ao buscar funil")
